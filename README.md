@@ -1,4 +1,3 @@
-[README (1).md](https://github.com/user-attachments/files/24461169/README.1.md)
 # NCDR CathPCI Coding Guidelines Repository
 
 A comprehensive, searchable web-based repository for NCDR CathPCI coding guidelines, integrating official documentation from multiple NCDR sources.
