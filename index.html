@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NCDR CathPCI Coding Guidelines Repository</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;600&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #0B5394;
+            --primary-light: #1270AD;
+            --accent: #0693E3;
+            --bg: #F7F9FC;
+            --surface: #FFFFFF;
+            --text: #1A2332;
+            --text-light: #5F6C7B;
+            --border: #D7DCE3;
+            --success: #0F9D58;
+            --warning: #F4B400;
+            --error: #DB4437;
+            --shadow: rgba(11, 83, 148, 0.08);
+            --shadow-hover: rgba(11, 83, 148, 0.15);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'IBM Plex Sans', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        .header {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%);
+            color: white;
+            padding: 2.5rem 2rem 3.5rem;
+            box-shadow: 0 4px 20px var(--shadow);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -30%;
+            right: -5%;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 70%);
+            border-radius: 50%;
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            position: relative;
+            z-index: 1;
+        }
+
+        h1 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 2.25rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.02em;
+        }
+
+        .subtitle {
+            font-size: 1.0rem;
+            opacity: 0.95;
+            font-weight: 400;
+        }
+
+        .container {
+            max-width: 1400px;
+            margin: -2rem auto 4rem;
+            padding: 0 2rem;
+            position: relative;
+            z-index: 2;
+        }
+
+        .search-section {
+            background: var(--surface);
+            padding: 2rem;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px var(--shadow);
+            margin-bottom: 2rem;
+        }
+
+        .search-controls {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .search-box {
+            position: relative;
+        }
+
+        .search-box input {
+            width: 100%;
+            padding: 0.875rem 1rem 0.875rem 3rem;
+            font-size: 1rem;
+            font-family: 'IBM Plex Sans', sans-serif;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            background: var(--bg);
+        }
+
+        .search-box input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(6, 147, 227, 0.1);
+        }
+
+        .search-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-light);
+        }
+
+        .seq-search {
+            position: relative;
+        }
+
+        .seq-search input {
+            width: 100%;
+            padding: 0.875rem 1rem 0.875rem 3rem;
+            font-size: 1rem;
+            font-family: 'IBM Plex Mono', monospace;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            transition: all 0.3s ease;
+            background: var(--bg);
+        }
+
+        .seq-search input:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(6, 147, 227, 0.1);
+        }
+
+        .seq-icon {
+            position: absolute;
+            left: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--text-light);
+            font-family: 'IBM Plex Mono', monospace;
+            font-weight: 600;
+        }
+
+        .filter-section {
+            margin-bottom: 1rem;
+        }
+
+        .filter-label {
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: var(--text-light);
+            margin-bottom: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .filters {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        .filter-btn {
+            padding: 0.5rem 1.125rem;
+            border: 2px solid var(--border);
+            background: var(--surface);
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: 'IBM Plex Sans', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--text);
+            transition: all 0.2s ease;
+        }
+
+        .filter-btn:hover {
+            border-color: var(--accent);
+            background: rgba(6, 147, 227, 0.05);
+        }
+
+        .filter-btn.active {
+            background: var(--accent);
+            color: white;
+            border-color: var(--accent);
+        }
+
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: var(--surface);
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px var(--shadow);
+            border-left: 4px solid var(--accent);
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-label {
+            color: var(--text-light);
+            font-size: 0.9rem;
+        }
+
+        .guidelines-grid {
+            display: grid;
+            gap: 1.5rem;
+        }
+
+        .guideline-card {
+            background: var(--surface);
+            border-radius: 12px;
+            padding: 1.75rem;
+            box-shadow: 0 2px 10px var(--shadow);
+            border: 1px solid var(--border);
+            transition: all 0.3s ease;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .guideline-card:hover {
+            box-shadow: 0 8px 30px var(--shadow-hover);
+            transform: translateY(-2px);
+        }
+
+        .guideline-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: start;
+            margin-bottom: 1rem;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .guideline-title {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+            flex: 1;
+            min-width: 250px;
+        }
+
+        .guideline-meta {
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .guideline-id {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.8rem;
+            color: var(--text-light);
+            background: var(--bg);
+            padding: 0.25rem 0.75rem;
+            border-radius: 6px;
+            border: 1px solid var(--border);
+        }
+
+        .sequence-badge {
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--primary);
+            background: rgba(11, 83, 148, 0.08);
+            padding: 0.375rem 0.875rem;
+            border-radius: 6px;
+            border: 1px solid rgba(11, 83, 148, 0.2);
+        }
+
+        .tags {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-bottom: 1rem;
+        }
+
+        .tag {
+            padding: 0.375rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 500;
+            white-space: nowrap;
+        }
+
+        .tag.source {
+            background: rgba(6, 147, 227, 0.1);
+            color: var(--primary-light);
+            border: 1px solid rgba(6, 147, 227, 0.3);
+        }
+
+        .tag.date {
+            background: rgba(15, 157, 88, 0.1);
+            color: var(--success);
+            font-family: 'IBM Plex Mono', monospace;
+            font-size: 0.75rem;
+        }
+
+        .guideline-content {
+            color: var(--text);
+            line-height: 1.7;
+            margin-bottom: 1rem;
+        }
+
+        .guideline-content strong {
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .content-section {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border);
+        }
+
+        .content-section h4 {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .content-section p {
+            color: var(--text);
+            line-height: 1.6;
+        }
+
+        .no-results {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--text-light);
+        }
+
+        .no-results svg {
+            width: 80px;
+            height: 80px;
+            margin-bottom: 1rem;
+            opacity: 0.5;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: var(--text-light);
+        }
+
+        .footer {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-light);
+            font-size: 0.9rem;
+            margin-top: 4rem;
+            border-top: 1px solid var(--border);
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.75rem;
+            }
+
+            .container {
+                padding: 0 1rem;
+            }
+
+            .search-controls {
+                grid-template-columns: 1fr;
+            }
+
+            .filters {
+                gap: 0.5rem;
+            }
+
+            .filter-btn {
+                font-size: 0.85rem;
+                padding: 0.4rem 0.8rem;
+            }
+
+            .guideline-header {
+                flex-direction: column;
+            }
+        }
+
+        .highlight {
+            background-color: rgba(244, 180, 0, 0.3);
+            padding: 0 2px;
+            border-radius: 2px;
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <h1>NCDR CathPCI Coding Guidelines Repository</h1>
+            <p class="subtitle">Searchable database of coding guidance from official NCDR sources</p>
+        </div>
+    </header>
+
+    <div class="container">
+        <div class="search-section">
+            <div class="search-controls">
+                <div class="search-box">
+                    <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <path d="m21 21-4.35-4.35"></path>
+                    </svg>
+                    <input type="text" id="searchInput" placeholder="Search by keyword, data element, question, or answer...">
+                </div>
+                
+                <div class="seq-search">
+                    <span class="seq-icon">#</span>
+                    <input type="text" id="seqInput" placeholder="Search by Sequence # (e.g., 7400)">
+                </div>
+            </div>
+            
+            <div class="filter-section">
+                <div class="filter-label">Filter by Source Document</div>
+                <div class="filters">
+                    <button class="filter-btn active" data-source="all">All Sources</button>
+                    <button class="filter-btn" data-source="Data Dictionary">Data Dictionary</button>
+                    <button class="filter-btn" data-source="Additional Coding Directives (FAQs)">Additional Coding Directives (FAQs)</button>
+                    <button class="filter-btn" data-source="Questions from your Peers">Questions from your Peers</button>
+                    <button class="filter-btn" data-source="Supplemental Dictionary">Supplemental Dictionary</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="stats">
+            <div class="stat-card">
+                <div class="stat-number" id="totalEntries">0</div>
+                <div class="stat-label">Total Entries</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="filteredCount">0</div>
+                <div class="stat-label">Showing</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="sourceCount">4</div>
+                <div class="stat-label">Source Documents</div>
+            </div>
+        </div>
+
+        <div class="loading" id="loading">
+            <p>Loading guidelines data...</p>
+        </div>
+
+        <div class="guidelines-grid" id="guidelinesGrid" style="display: none;"></div>
+
+        <div class="no-results" id="noResults" style="display: none;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8"></circle>
+                <path d="m21 21-4.35-4.35"></path>
+            </svg>
+            <h3>No guidelines found</h3>
+            <p>Try adjusting your search or filters</p>
+        </div>
+    </div>
+
+    <footer class="footer">
+        <p><strong>NCDR CathPCI Coding Guidelines Repository</strong> • Maintained by Carta Healthcare Abstraction Team</p>
+        <p style="margin-top: 0.5rem; font-size: 0.85rem;">Data sources: NCDR CathPCI Registry v5.0 Documentation</p>
+    </footer>
+
+    <script src="ncdr_app.js"></script>
+</body>
+</html>
