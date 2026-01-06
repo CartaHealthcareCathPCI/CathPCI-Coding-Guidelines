@@ -18,8 +18,7 @@ async function loadGuidelines() {
         
         document.getElementById('loading').style.display = 'none';
         document.getElementById('guidelinesGrid').style.display = 'grid';
-        
-        updateStats();
+
         renderGuidelines();
     } catch (error) {
         console.error('Error loading guidelines:', error);
@@ -108,8 +107,6 @@ function renderGuidelines() {
             grid.appendChild(card);
         });
     }
-    
-    updateFilteredCount(filteredGuidelines.length);
 }
 
 // Create a guideline card element
@@ -206,19 +203,6 @@ function escapeHtml(text) {
     const div = document.createElement('div');
     div.textContent = text;
     return div.innerHTML;
-}
-
-// Update statistics
-function updateStats() {
-    document.getElementById('totalEntries').textContent = allGuidelines.length;
-    
-    // Count unique sources
-    const sources = new Set(allGuidelines.map(g => g.source));
-    document.getElementById('sourceCount').textContent = sources.size;
-}
-
-function updateFilteredCount(count) {
-    document.getElementById('filteredCount').textContent = count;
 }
 
 // Helper function to clear all filters

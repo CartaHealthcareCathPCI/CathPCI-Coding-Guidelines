@@ -204,33 +204,6 @@
             border-color: var(--accent);
         }
 
-        .stats {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 1rem;
-            margin-bottom: 2rem;
-        }
-
-        .stat-card {
-            background: var(--surface);
-            padding: 1.5rem;
-            border-radius: 12px;
-            box-shadow: 0 2px 10px var(--shadow);
-            border-left: 4px solid var(--accent);
-        }
-
-        .stat-number {
-            font-size: 2rem;
-            font-weight: 700;
-            color: var(--primary);
-            margin-bottom: 0.25rem;
-        }
-
-        .stat-label {
-            color: var(--text-light);
-            font-size: 0.9rem;
-        }
-
         .guidelines-grid {
             display: grid;
             gap: 1.5rem;
@@ -463,21 +436,6 @@
                     <button class="filter-btn" data-source="Questions from your Peers">Questions from your Peers</button>
                     <button class="filter-btn" data-source="Supplemental Dictionary">Supplemental Dictionary</button>
                 </div>
-            </div>
-        </div>
-
-        <div class="stats">
-            <div class="stat-card">
-                <div class="stat-number" id="totalEntries">0</div>
-                <div class="stat-label">Total Entries</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-number" id="filteredCount">0</div>
-                <div class="stat-label">Showing</div>
-            </div>
-            <div class="stat-card">
-                <div class="stat-number" id="sourceCount">4</div>
-                <div class="stat-label">Source Documents</div>
             </div>
         </div>
 
