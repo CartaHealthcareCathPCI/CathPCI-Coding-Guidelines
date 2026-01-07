@@ -154,47 +154,109 @@ def extract_supplement(pdf_path):
     return entries
 
 def extract_data_dictionary_sample(pdf_path):
-    """Extract sample entries from Data Dictionary (first 50 pages for demo)"""
+    """Extract entries from Data Dictionary with structured fields"""
     entries = []
-    
+
     try:
         with pdfplumber.open(pdf_path) as pdf:
-            # Only process first 50 pages to keep data manageable
-            max_pages = min(50, len(pdf.pages))
-            
-            for page_num in range(max_pages):
-                page = pdf.pages[page_num]
+            current_entry = None
+            current_field = None
+
+            for page_num, page in enumerate(pdf.pages):
                 text = page.extract_text()
-                
+
                 if not text:
                     continue
-                
-                # Look for sequence numbers and definitions
-                # This is a simple extraction - the full version would be more sophisticated
-                seq_matches = re.finditer(r'Seq(?:uence)?[:#\s]*(\d+)', text, re.IGNORECASE)
-                
-                for match in seq_matches:
-                    seq_num = match.group(1)
-                    # Extract surrounding context (200 chars before and after)
-                    start = max(0, match.start() - 200)
-                    end = min(len(text), match.end() + 500)
-                    context = text[start:end]
-                    
-                    entry = {
-                        'id': f"DD-{seq_num}-{page_num}",
-                        'source': 'Data Dictionary',
-                        'published_date': '2024-11-15',
-                        'sequence': seq_num,
-                        'page': page_num + 1,
-                        'content': context.strip(),
-                        'keywords': []
-                    }
-                    
-                    text_content = f"{entry['sequence']} {entry['content']}"
-                    keywords = set(re.findall(r'\b[A-Za-z]{3,}\b', text_content.lower()))
-                    entry['keywords'] = sorted(list(keywords))[:20]
-                    
-                    entries.append(entry)
+
+                lines = text.split('\n')
+
+                for line in lines:
+                    line = line.strip()
+
+                    # Look for sequence numbers (start of new entry)
+                    seq_match = re.match(r'Seq(?:uence)?[:#\s]*(\d+)', line, re.IGNORECASE)
+                    if seq_match:
+                        # Save previous entry if exists
+                        if current_entry and current_entry.get('sequence'):
+                            entries.append(current_entry)
+
+                        # Start new entry
+                        seq_num = seq_match.group(1)
+                        current_entry = {
+                            'id': f"DD-{seq_num}",
+                            'source': 'Data Dictionary',
+                            'published_date': '2024-11-15',
+                            'sequence': seq_num,
+                            'element_reference': '',
+                            'name': '',
+                            'coding_instructions': '',
+                            'target_value': '',
+                            'supporting_definition': '',
+                            'keywords': []
+                        }
+                        current_field = None
+                        continue
+
+                    if not current_entry:
+                        continue
+
+                    # Identify field labels
+                    if re.match(r'Element\s+Reference', line, re.IGNORECASE):
+                        current_field = 'element_reference'
+                        # Try to extract value from same line
+                        value = re.sub(r'Element\s+Reference[:\s]*', '', line, flags=re.IGNORECASE).strip()
+                        if value:
+                            current_entry[current_field] = value
+                        continue
+                    elif re.match(r'^Name[:\s]*', line, re.IGNORECASE) and not re.search(r'element', line, re.IGNORECASE):
+                        current_field = 'name'
+                        value = re.sub(r'^Name[:\s]*', '', line, flags=re.IGNORECASE).strip()
+                        if value:
+                            current_entry[current_field] = value
+                        continue
+                    elif re.match(r'Coding\s+Instructions?', line, re.IGNORECASE):
+                        current_field = 'coding_instructions'
+                        value = re.sub(r'Coding\s+Instructions?[:\s]*', '', line, flags=re.IGNORECASE).strip()
+                        if value:
+                            current_entry[current_field] = value
+                        continue
+                    elif re.match(r'Target\s+Value', line, re.IGNORECASE):
+                        current_field = 'target_value'
+                        value = re.sub(r'Target\s+Value[:\s]*', '', line, flags=re.IGNORECASE).strip()
+                        if value:
+                            current_entry[current_field] = value
+                        continue
+                    elif re.match(r'Supporting\s+Definition', line, re.IGNORECASE):
+                        current_field = 'supporting_definition'
+                        value = re.sub(r'Supporting\s+Definition[:\s]*', '', line, flags=re.IGNORECASE).strip()
+                        if value:
+                            current_entry[current_field] = value
+                        continue
+
+                    # Add content to current field
+                    if current_field and line:
+                        if current_entry[current_field]:
+                            current_entry[current_field] += ' ' + line
+                        else:
+                            current_entry[current_field] = line
+
+            # Don't forget the last entry
+            if current_entry and current_entry.get('sequence'):
+                entries.append(current_entry)
+
+            # Generate keywords for all entries
+            for entry in entries:
+                text_content = ' '.join([
+                    entry.get('sequence', ''),
+                    entry.get('element_reference', ''),
+                    entry.get('name', ''),
+                    entry.get('coding_instructions', ''),
+                    entry.get('target_value', ''),
+                    entry.get('supporting_definition', '')
+                ])
+                keywords = set(re.findall(r'\b[A-Za-z]{3,}\b', text_content.lower()))
+                entry['keywords'] = sorted(list(keywords))[:20]
+
     except Exception as e:
         print(f"Error processing Data Dictionary: {e}")
         # Add placeholder entry
@@ -203,10 +265,14 @@ def extract_data_dictionary_sample(pdf_path):
             'source': 'Data Dictionary',
             'published_date': '2024-11-15',
             'sequence': '',
-            'content': 'Data Dictionary processing in progress. Full content will be available soon.',
+            'element_reference': '',
+            'name': 'Data Dictionary',
+            'coding_instructions': 'Data Dictionary processing in progress. Full content will be available soon.',
+            'target_value': '',
+            'supporting_definition': '',
             'keywords': ['data', 'dictionary', 'placeholder']
         })
-    
+
     return entries
 
 def main():

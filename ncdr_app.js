@@ -69,6 +69,7 @@ function filterGuidelines() {
             const searchableText = [
                 guideline.sequence || '',
                 guideline.element_name || '',
+                guideline.name || '',
                 guideline.data_field || '',
                 guideline.question || '',
                 guideline.answer || '',
@@ -76,9 +77,13 @@ function filterGuidelines() {
                 guideline.definition || '',
                 guideline.content || '',
                 guideline.section || '',
+                guideline.element_reference || '',
+                guideline.coding_instructions || '',
+                guideline.target_value || '',
+                guideline.supporting_definition || '',
                 ...(guideline.keywords || [])
             ].join(' ').toLowerCase();
-            
+
             keywordMatch = searchableText.includes(searchQuery);
         }
         
@@ -168,9 +173,52 @@ function createGuidelineCard(guideline, index) {
     } else if (guideline.source === 'Supplemental Dictionary') {
         titleHTML = guideline.section || 'Supplemental Entry';
         contentHTML = `<div class="guideline-content">${escapeHtml(guideline.content || '')}</div>`;
+    } else if (guideline.source === 'Data Dictionary') {
+        // Data Dictionary with structured fields
+        titleHTML = guideline.name || guideline.element_name || 'Data Dictionary Entry';
+
+        if (guideline.element_reference) {
+            contentHTML += `<div class="content-section">
+                <h4>Element Reference</h4>
+                <p>${escapeHtml(guideline.element_reference)}</p>
+            </div>`;
+        }
+
+        if (guideline.name || guideline.element_name) {
+            contentHTML += `<div class="content-section">
+                <h4>Name</h4>
+                <p>${escapeHtml(guideline.name || guideline.element_name)}</p>
+            </div>`;
+        }
+
+        if (guideline.coding_instructions) {
+            contentHTML += `<div class="content-section">
+                <h4>Coding Instructions</h4>
+                <p>${escapeHtml(guideline.coding_instructions)}</p>
+            </div>`;
+        }
+
+        if (guideline.target_value) {
+            contentHTML += `<div class="content-section">
+                <h4>Target Value</h4>
+                <p>${escapeHtml(guideline.target_value)}</p>
+            </div>`;
+        }
+
+        if (guideline.supporting_definition) {
+            contentHTML += `<div class="content-section">
+                <h4>Supporting Definition</h4>
+                <p>${escapeHtml(guideline.supporting_definition)}</p>
+            </div>`;
+        }
+
+        // Fallback to generic content if no structured fields
+        if (!guideline.element_reference && !guideline.coding_instructions && !guideline.target_value) {
+            contentHTML = `<div class="guideline-content">${escapeHtml(guideline.content || '')}</div>`;
+        }
     } else {
-        // Data Dictionary or other
-        titleHTML = 'Data Dictionary Entry';
+        // Other sources
+        titleHTML = 'Entry';
         contentHTML = `<div class="guideline-content">${escapeHtml(guideline.content || '')}</div>`;
     }
     
